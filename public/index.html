@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Haseł</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Generator Haseł</h1>
+    <form id="passwordForm">
+        <label for="length">Długość hasła:</label>
+        <input type="number" id="length" name="length" min="1" required>
+        
+        <h2>Wybierz znaki:</h2>
+        <div class="checkbox-group">
+            <label>
+                <input type="checkbox" id="uppercase" name="uppercase" checked> Duże litery
+            </label>
+            <label>
+                <input type="checkbox" id="lowercase" name="lowercase" checked> Małe litery
+            </label>
+            <label>
+                <input type="checkbox" id="numbers" name="numbers" checked> Cyfry
+            </label>
+            <label>
+                <input type="checkbox" id="specials" name="specials"> Znaki specjalne
+            </label>
+        </div>
+        
+        <button type="submit">Generuj hasło</button>
+    </form>
+
+    <div id="passwordResult" class="password-result" style="display: none;"></div>
+
+    <script>
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const length = document.getElementById('length').value;
+            const uppercase = document.getElementById('uppercase').checked;
+            const lowercase = document.getElementById('lowercase').checked;
+            const numbers = document.getElementById('numbers').checked;
+            const specials = document.getElementById('specials').checked;
+
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    length: length,
+                    uppercase: uppercase,
+                    lowercase: lowercase,
+                    numbers: numbers,
+                    specials: specials
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('passwordResult');
+                resultDiv.style.display = 'block';
+                resultDiv.textContent = `Wygenerowane hasło: ${data.password}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
